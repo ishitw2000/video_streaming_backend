@@ -29,7 +29,6 @@ public class VideoServiceImpl implements VideoService {
 		if (file.isEmpty()) {
 			throw new IllegalArgumentException("Video file cannot be empty");
 		}
-
 		if (title == null || title.isEmpty()) {
 			throw new IllegalArgumentException("Title cannot be empty");
 		}

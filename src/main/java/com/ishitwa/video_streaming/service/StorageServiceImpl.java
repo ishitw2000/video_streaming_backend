@@ -16,9 +16,6 @@ import org.springframework.util.StringUtils;
 @Service
 public class StorageServiceImpl implements StorageService {
 
-	// @Value("${storage.upload-dir}")
-	// private String uploadDir;
-
 	private final Path rootLocation;
 
 	public StorageServiceImpl(@Value("${storage.upload-dir}") String uploadDir) {

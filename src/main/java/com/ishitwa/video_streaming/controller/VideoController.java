@@ -48,11 +48,6 @@ public class VideoController {
 			User user = userService.getUserByUsername(username);
 
 			if (user == null) {
-
-				// TODO: Handle unauthenticated user
-				// * logged in user is not being returned, fix
-				// The upload functionality is working fine.
-
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 			}
 
@@ -74,6 +69,15 @@ public class VideoController {
 	@GetMapping("/user/{userId}")
 	public ResponseEntity<List<Video>> getVideosByUser(@PathVariable Long userId) {
 		List<Video> videos = videoService.getAllVideosByUserId(userId);
+		for (Video v : videos) {
+			System.out.println(v.toString());
+		}
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		User user = userService.getUserByUsername(authentication.getName());
+		System.out.println(user.toString());
+		if (user.getId() != userId) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
 		return ResponseEntity.ok(videos);
 	}
 
@@ -81,6 +85,11 @@ public class VideoController {
 	public ResponseEntity<Video> getVideoById(@PathVariable Long id) {
 		try {
 			Video video = videoService.getVideoById(id);
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			User user = userService.getUserByUsername(authentication.getName());
+			if (user.getId() != video.getUserId()) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			}
 			return ResponseEntity.ok(video);
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.notFound().build();

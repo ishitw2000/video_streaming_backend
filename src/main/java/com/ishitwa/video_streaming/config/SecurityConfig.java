@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.ishitwa.video_streaming.service.CustomUserDetailsService;
 
@@ -25,15 +26,19 @@ public class SecurityConfig {
 	}
 
 	@Bean
+	public JwtAuthenticationFilter jwtAuthenticationFilter() {
+		return new JwtAuthenticationFilter();
+	}
+
+	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.cors(cors -> {
 		})
 				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(authorize -> authorize
-						.requestMatchers("/api/register", "/api/login", "/api/videos/**").permitAll()
+						.requestMatchers("/api/register", "/api/login").permitAll()
 						.anyRequest().authenticated())
-				.httpBasic(httpBasic -> {
-				});
+				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 	}
 
