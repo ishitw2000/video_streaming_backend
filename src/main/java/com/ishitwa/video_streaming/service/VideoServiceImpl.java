@@ -22,7 +22,7 @@ public class VideoServiceImpl implements VideoService {
 	private VideoRepository videoRepository;
 
 	@Autowired
-	private StorageService storageService;
+	private StorageServiceImpl storageService;
 
 	@Override
 	public Video uploadVideo(String title, String description, MultipartFile file, Long userId) {

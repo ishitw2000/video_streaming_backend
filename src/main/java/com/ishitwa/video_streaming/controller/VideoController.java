@@ -14,8 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ishitwa.video_streaming.model.User;
 import com.ishitwa.video_streaming.model.Video;
-import com.ishitwa.video_streaming.service.UserService;
-import com.ishitwa.video_streaming.service.VideoService;
+import com.ishitwa.video_streaming.service.UserServiceImpl;
+import com.ishitwa.video_streaming.service.VideoServiceImpl;
 import com.ishitwa.video_streaming.utils.VideoStatus;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,10 +30,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class VideoController {
 
 	@Autowired
-	private VideoService videoService;
+	private VideoServiceImpl videoService;
 
 	@Autowired
-	private UserService userService;
+	private UserServiceImpl userService;
 
 	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<Video> uploadVideo(
@@ -48,6 +48,11 @@ public class VideoController {
 			User user = userService.getUserByUsername(username);
 
 			if (user == null) {
+
+				// TODO: Handle unauthenticated user
+				// * logged in user is not being returned, fix
+				// The upload functionality is working fine.
+
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 			}
 

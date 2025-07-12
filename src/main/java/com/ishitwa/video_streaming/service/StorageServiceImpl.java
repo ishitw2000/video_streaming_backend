@@ -16,12 +16,12 @@ import org.springframework.util.StringUtils;
 @Service
 public class StorageServiceImpl implements StorageService {
 
-	@Value("${storage.upload-dir}")
-	private String uploadDir;
+	// @Value("${storage.upload-dir}")
+	// private String uploadDir;
 
 	private final Path rootLocation;
 
-	public StorageServiceImpl() {
+	public StorageServiceImpl(@Value("${storage.upload-dir}") String uploadDir) {
 		this.rootLocation = Path.of(uploadDir);
 		init();
 	}
@@ -32,7 +32,7 @@ public class StorageServiceImpl implements StorageService {
 				java.nio.file.Files.createDirectories(rootLocation);
 			}
 		} catch (Exception e) {
-			throw new RuntimeException("Could not initialize storage", e);
+			throw new RuntimeException("****************** Could not initialize storage", e);
 		}
 	}
 
