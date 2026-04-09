@@ -2,6 +2,7 @@ package com.ishitwa.video_streaming.utils;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -11,10 +12,15 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-	private final String jwtSecret = "secretKeysecretKeysecretKeysecretKey"; // at least 256 bits for HS256
+	private final SecretKey key;
 	private final long jwtExpirationMs = 86400000; // 1 day
 
-	private final SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+	public JwtUtil(@Value("${JWT_SECRET:secretKeysecretKeysecretKeysecretKey}") String jwtSecret) {
+		if (jwtSecret.getBytes(StandardCharsets.UTF_8).length < 32) {
+			throw new IllegalArgumentException("JWT_SECRET must be at least 32 characters");
+		}
+		this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+	}
 
 	public String generateToken(String username) {
 		return Jwts.builder()

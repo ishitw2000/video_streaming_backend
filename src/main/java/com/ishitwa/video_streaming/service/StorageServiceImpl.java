@@ -62,12 +62,17 @@ public class StorageServiceImpl implements StorageService {
 	@Override
 	public Path retrieveFile(String filename) {
 		try {
-			Path file = rootLocation.resolve(filename);
+			Path file = rootLocation.resolve(filename).normalize().toAbsolutePath();
+			if (!file.startsWith(rootLocation.toAbsolutePath())) {
+				throw new IllegalArgumentException("Cannot access file outside storage directory: " + filename);
+			}
 			if (Files.exists(file)) {
 				return file;
 			} else {
 				throw new RuntimeException("File not found: " + filename);
 			}
+		} catch (IllegalArgumentException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to retrieve file " + filename, e);
 		}

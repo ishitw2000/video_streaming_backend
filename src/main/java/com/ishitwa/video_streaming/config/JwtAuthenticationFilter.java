@@ -2,7 +2,6 @@ package com.ishitwa.video_streaming.config;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,11 +18,13 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-	@Autowired
-	private JwtUtil jwtUtil;
+	private final JwtUtil jwtUtil;
+	private final CustomUserDetailsService userDetailsService;
 
-	@Autowired
-	private CustomUserDetailsService userDetailsService;
+	public JwtAuthenticationFilter(JwtUtil jwtUtil, CustomUserDetailsService userDetailsService) {
+		this.jwtUtil = jwtUtil;
+		this.userDetailsService = userDetailsService;
+	}
 
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
@@ -33,9 +34,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		String token = null;
 		String username = null;
 
-		if (header != null && header.startsWith("Bearer ")) {
-			token = header.substring(7);
-			username = jwtUtil.getUsernameFromToken(token);
+		try {
+			if (header != null && header.startsWith("Bearer ")) {
+				token = header.substring(7);
+				username = jwtUtil.getUsernameFromToken(token);
+			} else {
+				String queryToken = request.getParameter("token");
+				if (queryToken != null && !queryToken.isEmpty()) {
+					token = queryToken;
+					username = jwtUtil.getUsernameFromToken(token);
+				}
+			}
+		} catch (Exception ignored) {
+			// invalid token — request proceeds unauthenticated
 		}
 
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -43,7 +54,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			if (jwtUtil.validateJwtToken(token)) {
 				UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
 						userDetails, null, userDetails.getAuthorities());
-
 				SecurityContextHolder.getContext().setAuthentication(auth);
 			}
 		}

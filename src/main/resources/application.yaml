@@ -11,8 +11,8 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   servlet:
     multipart:
-      max-file-size: 100MB
-      max-request-size: 100MB
+      max-file-size: 4GB
+      max-request-size: 4GB
 
 storage:
   upload-dir: ${user.dir}/uploads

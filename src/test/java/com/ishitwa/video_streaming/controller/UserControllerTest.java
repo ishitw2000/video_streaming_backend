@@ -54,7 +54,8 @@ class UserControllerTest {
         when(jwtUtil.generateToken("testuser")).thenReturn("jwt-token");
         ResponseEntity<?> response = userController.loginUser(login);
         assertEquals(200, response.getStatusCodeValue());
-        assertTrue(((Map<?,?>)response.getBody()).containsKey("token"));
+        assertTrue(((Map<?,?>) response.getBody()).containsKey("token"));
+        assertEquals("jwt-token", ((Map<?, ?>) response.getBody()).get("token"));
     }
 
     @Test
@@ -81,6 +82,7 @@ class UserControllerTest {
         ResponseEntity<?> response = userController.loginUser(login);
         assertEquals(401, response.getStatusCodeValue());
         assertEquals("Login Failed", response.getBody());
+        verify(passwordEncoder, never()).matches(anyString(), anyString());
     }
 }
 

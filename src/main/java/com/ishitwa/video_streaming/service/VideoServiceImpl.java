@@ -4,6 +4,7 @@ import java.sql.Time;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,10 @@ import jakarta.transaction.Transactional;
 @Service
 public class VideoServiceImpl implements VideoService {
 
+	private static final Set<String> ALLOWED_MIME_TYPES = Set.of(
+			"video/mp4", "video/webm", "video/ogg", "video/quicktime",
+			"video/x-msvideo", "video/x-matroska", "video/mpeg");
+
 	@Autowired
 	private VideoRepository videoRepository;
 
@@ -31,6 +36,10 @@ public class VideoServiceImpl implements VideoService {
 		}
 		if (title == null || title.isEmpty()) {
 			throw new IllegalArgumentException("Title cannot be empty");
+		}
+		String contentType = file.getContentType();
+		if (contentType == null || !ALLOWED_MIME_TYPES.contains(contentType)) {
+			throw new IllegalArgumentException("Invalid file type. Only video files are allowed.");
 		}
 
 		String filePath = storageService.saveFile(file);
